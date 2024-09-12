@@ -10,6 +10,7 @@ kinesis_client = boto3.client('kinesis', region_name='eu-west-1')
 sqs_client = boto3.client('sqs', region_name='eu-west-1')
 queue_url = os.getenv("QUEUE_URL")
 
+
 def lambda_handler(event, context):
     logger.info(f"Received SNS event: {json.dumps(event, indent=2)}")
 

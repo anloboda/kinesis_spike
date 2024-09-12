@@ -1,5 +1,4 @@
 import logging
-import random
 from datetime import datetime
 from aws_lambda_powertools.utilities.data_classes.kinesis_stream_event import KinesisStreamRecord
 from aws_lambda_powertools.utilities.typing import LambdaContext
@@ -17,7 +16,7 @@ processor = BatchProcessor(event_type=EventType.KinesisDataStreams)
 
 
 def handle_record(record: KinesisStreamRecord, context: LambdaContext):
-    if random.choice([True, False]):
+    if "record5" in record.kinesis.data_as_text():
         logger.info(f"!!! exception for the record {record.kinesis.data_as_text()}")
         raise Exception("Random exception occurred!")
     else:

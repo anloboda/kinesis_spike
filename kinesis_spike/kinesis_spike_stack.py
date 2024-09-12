@@ -35,7 +35,6 @@ class KinesisSpikeStack(Stack):
 
         kinesis_stream.grant_write(publisher)
 
-
         processor = _lambda.Function(self, "KinesisRecordProcessor",
             function_name='kinesis-record-processor-lambda-cdk',
             runtime=_lambda.Runtime.PYTHON_3_9,
@@ -44,19 +43,8 @@ class KinesisSpikeStack(Stack):
             layers=[powertools_layer]
         )
 
-        processor.add_to_role_policy(
-            iam.PolicyStatement(
-                actions=["kinesis:GetRecords", "kinesis:GetShardIterator", "kinesis:DescribeStream", "kinesis:ListStreams"],
-                resources=[kinesis_stream.stream_arn]
-            )
-        )
-
-        processor.add_to_role_policy(
-            iam.PolicyStatement(
-                actions=["sns:Publish"],
-                resources=[failure_topic.topic_arn]
-            )
-        )
+        kinesis_stream.grant_read(processor)
+        failure_topic.grant_publish(processor)
 
         event_source_mapping = lambda_event_sources.KinesisEventSource(
             kinesis_stream,

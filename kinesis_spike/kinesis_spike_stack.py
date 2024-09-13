@@ -19,7 +19,6 @@ class KinesisSpikeStack(Stack):
         kinesis_stream = kinesis.Stream(self, "TestKinesisStream", stream_name="TestStream")
         failure_topic = sns.Topic(self, "FailedKinesisRecordsTopic", topic_name="FailedKinesisRecordsTopic")
         failed_dlq = sqs.Queue(self, "FailedKinesisRecordDLQ", queue_name="FailedKinesisRecordDLQ")
-
         powertools_layer = _lambda.LayerVersion.from_layer_version_arn(
             self,
             "PowertoolsLayer",
@@ -34,7 +33,6 @@ class KinesisSpikeStack(Stack):
         )
 
         kinesis_stream.grant_write(publisher)
-
         processor = _lambda.Function(self, "KinesisRecordProcessor",
             function_name='kinesis-record-processor-lambda-cdk',
             runtime=_lambda.Runtime.PYTHON_3_9,
@@ -51,6 +49,7 @@ class KinesisSpikeStack(Stack):
             batch_size=10,
             starting_position=_lambda.StartingPosition.TRIM_HORIZON,
             report_batch_item_failures=True,
+            bisect_batch_on_error=True,
             on_failure=lambda_event_sources.SnsDlq(failure_topic),
             retry_attempts=2
         )

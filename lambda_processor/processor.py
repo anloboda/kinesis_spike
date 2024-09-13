@@ -16,11 +16,12 @@ processor = BatchProcessor(event_type=EventType.KinesisDataStreams)
 
 
 def handle_record(record: KinesisStreamRecord, context: LambdaContext):
-    if "record5" in record.kinesis.data_as_text():
-        logger.info(f"!!! exception for the record {record.kinesis.data_as_text()}")
+    data = record.kinesis.data_as_text()
+    if "record1" in data or "record2" in data:
+        logger.info(f"!!! exception for the record {data}")
         raise Exception("Random exception occurred!")
     else:
-        logger.info(f"no exception for the record {record.kinesis.data_as_text()}")
+        logger.info(f"no exception for the record {data}")
 
 
 @event_source(data_class=KinesisStreamEvent)
